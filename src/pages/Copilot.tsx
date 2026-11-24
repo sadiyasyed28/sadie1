@@ -365,74 +365,14 @@ export const Copilot: React.FC = () => {
               <ClinicalMessageView
                 key={msg.id}
                 message={msg}
-                queryTitle={lastUserQuery}
-                scopedCaseName={currentCase?.patientName || 'Eleanor Vance'}
-                scopedCaseId={currentCase?.caseNumber || 'CAS-8821'}
+
               />
             ))}
 
-            {/* In-Flight Real-Time Thinking Progress (Card-Free, Sleek Fluid Timeline) */}
             {isSending && (
-              <div className="py-3 space-y-3 animate-reply-in max-w-3xl">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-btn-primary-bg text-btn-primary-text flex items-center justify-center text-xs font-bold shrink-0 animate-spin">
-                    ✦
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-xs text-primary">SADIE</span>
-                    <span className="text-[11px] text-muted font-mono animate-pulse">evaluating maxillofacial records...</span>
-                  </div>
-                </div>
-
-                {/* Direct inline timeline with subtle border-l (No card wrapper) */}
-                <div className="border-l-2 border-border-hairline pl-3.5 my-2 space-y-2.5 text-xs">
-                  {/* Searched Sources chips */}
-                  <div className="flex items-center gap-1.5 flex-wrap pb-1">
-                    <span className="text-muted text-[11px] flex items-center gap-1">
-                      <Globe className="w-3 h-3 text-muted" /> Searched:
-                    </span>
-                    {['Patient CBCT Archive', 'Operative Transcription', 'Cephalometric Norms v3.2', 'NSQIP Clinical Rubric'].map((s, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-elevated border border-border-hairline text-secondary font-mono"
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#8EC5E8]" />
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Progressive animated step-by-step display */}
-                  <div className="space-y-2 pl-0.5">
-                    {[
-                      `Finding patient DICOM scan: ${currentCase?.patientName || 'Eleanor_Vance'}_PostOp_CBCT.dcm...`,
-                      'Calculating 3D cephalometric landmarks (SNA, SNB, ANB, Pog, Menton)...',
-                      'Calculating airway volumetric clearance and minimum cross-sectional area...',
-                      'Evaluating clinical decision criteria against NSQIP standards...',
-                      'Synthesizing clinical evaluation decision recommendation...'
-                    ].map((stepText, idx) => {
-                      const isDone = idx < reasoningStepIndex;
-                      const isActive = idx === reasoningStepIndex;
-                      if (idx > reasoningStepIndex) return null;
-
-                      return (
-                        <div
-                          key={idx}
-                          className={`flex items-start gap-2 text-xs transition-all animate-reply-in ${
-                            isActive ? 'text-primary font-medium' : 'text-secondary'
-                          }`}
-                        >
-                          {isDone ? (
-                            <span className="text-[#8EC5E8] mt-0.5 text-[11px] font-bold shrink-0">✓</span>
-                          ) : (
-                            <span className="w-2 h-2 rounded-full bg-[#8EC5E8] mt-1 shrink-0 animate-ping" />
-                          )}
-                          <span className="leading-relaxed">{stepText}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+              <div className="py-3 flex items-center gap-2.5 text-xs text-secondary" role="status" aria-live="polite">
+                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                Sending message to the project assistant…
               </div>
             )}
 
