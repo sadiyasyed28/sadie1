@@ -231,7 +231,7 @@ This source should be treated as the immediate-post-operative, fracture-specific
 3. **Not-assessed / not-applicable handling:** Define explicit states and whether a case can be summarized when one or more criteria cannot be assessed.
 4. **Timing:** Confirm the intended assessment window. The bedside checklist explicitly says PACU to Day 3; the remaining sections use "immediate post-op" without a single timing definition.
 5. **Multiple fracture patterns:** Define how to select and combine fracture-specific sections in combined/panfacial injuries.
-6. **Threshold clarification:** Review numerical boundaries and overlapping wording. For example, the orbital globe-position section describes both Grade 3 symmetry and Grade 2 mild displacement using a "<2 mm" boundary. Confirm the exact interpretation.
+6. **Threshold clarification:** Review numerical boundaries and overlapping/ambiguous wording. Examples requiring surgeon interpretation include: (a) orbital globe position uses a "<2 mm" boundary in both Grade 3 and Grade 2 descriptions; (b) NOE ICD lists Grade 3 as 30-35 mm and Grade 2 as 35-37 mm, overlapping at 35 mm; and (c) the mandibular page's cortical-border assessment says "gap <1-2 mm", while its three-tier table uses <1 mm, 1-2 mm, and >2 mm. Confirm exact inclusive/exclusive boundaries and resolve wording.
 7. **Imaging protocols:** Confirm modality, slice thickness, planes, measurement technique, quality requirements, and who verifies each radiological criterion.
 8. **Emergency escalation:** Confirm local escalation pathways and who is responsible for acknowledging and documenting critical red flags.
 9. **Approval record:** Surgeon(s), specialty reviewers, approval date, rubric version, changes requested, and effective date.
