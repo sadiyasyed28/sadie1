@@ -134,8 +134,13 @@ adrab/
 │   ├── candidate_rubrics/           # Multi-chapter surgical evidence tables
 │   ├── phase_05_candidate_rubric.csv # 8-domain CMF clinical evaluation rubric
 │   └── synthetic_cases/             # Diverse synthetic validation cases (CASE-SYN01 to SYN06)
-├── references/                      # Clinical reference notes & extraction logs
-├── reports/                         # Detailed milestone reports (Phase 01 through Phase 07F)
+├── references/
+│   ├── Rubrics/
+│   │   └── Immediate_PostOp_Maxillofacial_Trauma_Rubric.md # Surgeon-review-pending immediate post-op rubric
+│   └── Books/                        # Clinical reference notes & extraction logs
+├── reports/
+│   └── immediate_postop_backend_integration_plan.md # Backend integration and clinical guardrails
+│   # Detailed milestone reports (Phase 01 through Phase 07F)
 │   ├── phase_06c_integration_report.md
 │   ├── phase_07a_imaging_pipeline_report.md
 │   └── phase_07f_slicer_integration_readiness_report.md
