@@ -1,0 +1,436 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adrab.ai/schemas/immediate_postop_assessment_record.schema.json",
+  "title": "ImmediatePostoperativeMaxillofacialTraumaAssessmentRecord",
+  "description": "Non-scoring capture contract for raw, attributed observations recorded against the draft immediate-postoperative maxillofacial trauma rubric. Clinical grading, aggregate scoring, PASS/FAIL, automated decisions, and model-derived conclusions are deliberately excluded pending surgeon approval.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "assessment_id",
+    "case_id",
+    "rubric_reference",
+    "assessment_context",
+    "observations",
+    "red_flag_events"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "assessment_id": {
+      "type": "string",
+      "pattern": "^POSTOP-[A-Z0-9-]{6,40}$"
+    },
+    "case_id": {
+      "type": "string",
+      "pattern": "^CASE-[A-Z0-9]{4,12}$",
+      "description": "Pseudonymous project case identifier; do not include patient name or MRN."
+    },
+    "rubric_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rubric_id",
+        "rubric_version",
+        "approval_status",
+        "source_path"
+      ],
+      "properties": {
+        "rubric_id": {
+          "type": "string",
+          "const": "IMMEDIATE_POSTOP_MAXILLOFACIAL_TRAUMA"
+        },
+        "rubric_version": {
+          "type": "string",
+          "const": "DRAFT-2026-11"
+        },
+        "approval_status": {
+          "type": "string",
+          "const": "PENDING_SURGEON_APPROVAL"
+        },
+        "source_path": {
+          "type": "string",
+          "const": "references/Rubrics/Immediate_PostOp_Maxillofacial_Trauma_Rubric.md"
+        }
+      }
+    },
+    "assessment_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fracture_groups",
+        "assessment_timing",
+        "assessment_datetime",
+        "assessor"
+      ],
+      "properties": {
+        "fracture_groups": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "MANDIBULAR",
+              "ZMC_ZYGOMATIC_ARCH",
+              "ORBITAL",
+              "LE_FORT_MIDFACE",
+              "NOE",
+              "FRONTAL_PANFACIAL"
+            ]
+          }
+        },
+        "assessment_timing": {
+          "type": "string",
+          "enum": [
+            "PACU",
+            "POD_0",
+            "POD_1",
+            "POD_2",
+            "POD_3",
+            "OTHER"
+          ]
+        },
+        "assessment_datetime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "other_timing_description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 250
+        },
+        "assessor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "assessor_id",
+            "professional_role"
+          ],
+          "properties": {
+            "assessor_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._-]{2,64}$"
+            },
+            "professional_role": {
+              "type": "string",
+              "enum": [
+                "OPERATING_SURGEON",
+                "ATTENDING_SURGEON",
+                "RESIDENT",
+                "FELLOW",
+                "ORAL_MAXILLOFACIAL_RADIOLOGIST",
+                "OTHER_AUTHORIZED_CLINICIAN"
+              ]
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "assessment_timing": {
+                "const": "OTHER"
+              }
+            },
+            "required": [
+              "assessment_timing"
+            ]
+          },
+          "then": {
+            "required": [
+              "other_timing_description"
+            ],
+            "properties": {
+              "other_timing_description": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "observation_id",
+          "fracture_group",
+          "criterion_label",
+          "evidence_channel",
+          "observation_status",
+          "recorded_by",
+          "recorded_at"
+        ],
+        "properties": {
+          "observation_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._-]{3,64}$"
+          },
+          "fracture_group": {
+            "type": "string",
+            "enum": [
+              "MANDIBULAR",
+              "ZMC_ZYGOMATIC_ARCH",
+              "ORBITAL",
+              "LE_FORT_MIDFACE",
+              "NOE",
+              "FRONTAL_PANFACIAL"
+            ]
+          },
+          "criterion_label": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 180,
+            "description": "Use the corresponding assessment factor wording from the source rubric. This is descriptive only, not a grade."
+          },
+          "evidence_channel": {
+            "type": "string",
+            "enum": [
+              "CLINICAL_EXAM",
+              "RADIOLOGICAL_REVIEW",
+              "PATIENT_REPORTED"
+            ]
+          },
+          "observation_status": {
+            "type": "string",
+            "enum": [
+              "OBSERVED",
+              "NOT_ASSESSED",
+              "NOT_APPLICABLE",
+              "INDETERMINATE",
+              "CONFLICTING_EVIDENCE"
+            ]
+          },
+          "finding_text": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4000
+          },
+          "measurement": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "required": [
+              "value",
+              "unit",
+              "method"
+            ],
+            "properties": {
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string",
+                "enum": [
+                  "mm",
+                  "cm",
+                  "cm3",
+                  "mL",
+                  "degrees",
+                  "count",
+                  "other"
+                ]
+              },
+              "method": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 500
+              },
+              "modality": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "CT",
+                  "CBCT",
+                  "OPG",
+                  "PLAIN_RADIOGRAPH",
+                  "CLINICAL_EXAM",
+                  "OTHER",
+                  null
+                ]
+              }
+            }
+          },
+          "evidence_references": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "reference_id",
+                "reference_type"
+              ],
+              "properties": {
+                "reference_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "reference_type": {
+                  "type": "string",
+                  "enum": [
+                    "CASE_FILE",
+                    "IMAGING_SERIES",
+                    "CLINICAL_NOTE",
+                    "OTHER"
+                  ]
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 500
+                }
+              }
+            }
+          },
+          "recorded_by": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 64
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "quality_or_limitation_note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 1500
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "observation_status": {
+                  "const": "OBSERVED"
+                }
+              },
+              "required": [
+                "observation_status"
+              ]
+            },
+            "then": {
+              "required": [
+                "finding_text"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "red_flag_events": {
+      "type": "array",
+      "description": "Separate safety-event record. Do not reduce red flags to a grade, average, or score.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "event_id",
+          "flag_description",
+          "event_status",
+          "observed_at",
+          "reported_by"
+        ],
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._-]{3,64}$"
+          },
+          "flag_description": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 1000
+          },
+          "event_status": {
+            "type": "string",
+            "enum": [
+              "REPORTED_UNVERIFIED",
+              "CLINICIAN_CONFIRMED",
+              "NOT_CONFIRMED_AFTER_REVIEW",
+              "ESCALATED",
+              "CLOSED_BY_AUTHORIZED_CLINICIAN"
+            ]
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reported_by": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 64
+          },
+          "escalation_reference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 128
+          },
+          "review_note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 1500
+          }
+        }
+      }
+    },
+    "review_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "surgeon_review_status": {
+          "type": "string",
+          "enum": [
+            "NOT_REVIEWED",
+            "IN_REVIEW",
+            "COMMENTS_RECORDED"
+          ]
+        },
+        "reviewed_by": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "reviewed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "comments": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 4000
+        }
+      }
+    }
+  }
+}
