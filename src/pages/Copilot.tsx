@@ -76,7 +76,6 @@ export const Copilot: React.FC = () => {
     const trimmedText = text.trim();
     if (!trimmedText || isSending) return;
 
-    setLastUserQuery(trimmedText);
     setInputMessage('');
     setIsSending(true);
     setIsChatActive(true);
