@@ -36,12 +36,14 @@ The project audit for Fonseca Chapter 12 explicitly says its extracted records a
 The project's verification audit classifies **3** papers as full-text verified and **11** as abstract-only. These statuses are reported from the project audit, not independently re-audited here. Abstract-only sources must not be used to justify detailed thresholds or full-text claims.
 
 ## Included project-created evidence records
+The extracted chapter summaries, book evidence audits, research synthesis, verification audit, verification log and search strategy are copied into this `Books` folder for easier surgeon access. These are project-created extracts and audit reports, **not** the source books or original research article PDFs.
+
 - `01_Book_Evidence/Fonseca_Chapter_12_Summary.md` — 28 extracted records summary and explicit diagnostic-vs-outcome boundary.
-- `01_Book_Evidence/Perry_Atlas_Aftercare_Chapter_20_Summary.md` — 20 extracted aftercare/follow-up records summary.
+- `01_Book_Evidence/Perry_Aftercare_Chapter_Summary.md` — 20 extracted aftercare/follow-up records summary.
 - `01_Book_Evidence/Chapter_12_Evidence_Audit.md` — book chapter evidence audit.
-- `01_Book_Evidence/Atlas_Aftercare_Chapter_20_Validation.md` — chapter designation and extraction validation.
+- `01_Book_Evidence/Perry_Aftercare_Chapter_Validation.md` — chapter designation and extraction validation.
 - `02_Research_Papers/Research_Batch_01_Summary.md` — project evidence synthesis.
-- `02_Research_Papers/Research_Bibliography_and_Verification_Audit.md` — full bibliography and verification classifications.
+- `02_Research_Papers/Research_Verification_Audit.md` — paper-by-paper bibliography and evidence verification classifications.
 - `02_Research_Papers/Research_Verification_Log.md` — recorded verification notes.
 - `02_Research_Papers/Research_Search_Strategy.md` — search strategy.
 
