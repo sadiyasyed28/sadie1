@@ -22,6 +22,16 @@ CMF trauma management spans complex anatomical zones (orbit, zygoma, mandible, m
 
 ---
 
+## 🩺 Immediate Post-Operative Trauma Rubric (Surgeon Review Pending)
+
+A separate, user-supplied **Immediate Post-Operative Maxillofacial Trauma Rubric** is documented at [`references/Rubrics/Immediate_PostOp_Maxillofacial_Trauma_Rubric.md`](references/Rubrics/Immediate_PostOp_Maxillofacial_Trauma_Rubric.md). It covers mandibular, ZMC/zygomatic arch, orbital, Le Fort, NOE, and frontal/panfacial fracture groups, with clinical and radiological assessment factors, three grade descriptors, and a PACU-to-Day-3 bedside red-flag checklist.
+
+**This rubric is a draft pending surgeon approval.** It is a distinct immediate-postoperative workflow and does not silently replace the Phase 05 candidate rubric or the existing eight-domain evaluator. Until written clinical sign-off is recorded, the application may store/display the rubric and capture raw attributed observations, but must not assign clinical grades, calculate totals/means/overall PASS-FAIL, train a clinical model against it, or provide revision/treatment decisions from it. The worked scorecard in the source is example content, not patient data or validated ground truth.
+
+The source includes an example aggregate score (29/30, mean 2.90, "OPTIMAL / PASS"), which conflicts with ADRAB's current prohibition on unvalidated composite scores. This must be resolved explicitly with the surgeon before any aggregation is implemented.
+
+---
+
 ## 📐 Architecture & Pipeline
 
 ```mermaid
