@@ -437,3 +437,62 @@ create trigger audit_safety_events
 create trigger audit_copilot_conversations
   after insert or update or delete on public.copilot_conversations
   for each row execute procedure public.write_case_audit_event();
+
+
+-- Ensure cascade deletes do not violate the audit table's case foreign key.
+create or replace function public.write_case_audit_event()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_row jsonb;
+  v_case_id uuid;
+  v_resource_id text;
+  v_actor uuid;
+begin
+  v_row := case when tg_op = 'DELETE' then to_jsonb(old) else to_jsonb(new) end;
+  v_actor := auth.uid();
+
+  if tg_table_name = 'cases' then
+    v_case_id := (v_row->>'id')::uuid;
+    v_resource_id := v_row->>'id';
+    if v_actor is null then v_actor := nullif(v_row->>'owner_id','')::uuid; end if;
+  else
+    v_case_id := nullif(v_row->>'case_id','')::uuid;
+    v_resource_id := v_row->>'id';
+    if v_actor is null then
+      v_actor := coalesce(
+        nullif(v_row->>'recorded_by','')::uuid,
+        nullif(v_row->>'created_by','')::uuid,
+        nullif(v_row->>'uploaded_by','')::uuid,
+        nullif(v_row->>'user_id','')::uuid
+      );
+    end if;
+  end if;
+
+  if v_case_id is not null
+     and not exists (select 1 from public.cases where id = v_case_id) then
+    v_case_id := null;
+  end if;
+
+  if v_actor is not null then
+    insert into public.audit_events (
+      case_id, actor_id, action, resource_type, resource_id, metadata
+    ) values (
+      v_case_id,
+      v_actor,
+      lower(tg_op),
+      tg_table_name,
+      v_resource_id,
+      jsonb_build_object(
+        'related_case_id', coalesce(v_row->>'case_id', v_row->>'id'),
+        'recorded_at', now()
+      )
+    );
+  end if;
+
+  return case when tg_op = 'DELETE' then old else new end;
+end;
+$$;
