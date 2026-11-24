@@ -38,7 +38,7 @@ import {
   mockCopilotConversations
 } from '../data/mockData';
 
-// Local in-memory state initialized from mock data
+// Temporary in-memory prototype state; persists only for the life of this server/browser module.
 let casesState: CaseItem[] = [];
 let usersState: UserItem[] = [];
 let knowledgeDocsState: KnowledgeDocument[] = [];
