@@ -138,15 +138,15 @@ adrab/
 │   ├── Rubrics/
 │   │   └── Immediate_PostOp_Maxillofacial_Trauma_Rubric.md # Surgeon-review-pending immediate post-op rubric
 │   └── Books/                        # Clinical reference notes & extraction logs
-├── reports/
-│   └── immediate_postop_backend_integration_plan.md # Backend integration and clinical guardrails
-│   # Detailed milestone reports (Phase 01 through Phase 07F)
+├── reports/                         # Backend integration notes and milestone reports
+│   ├── immediate_postop_backend_integration_plan.md
 │   ├── phase_06c_integration_report.md
 │   ├── phase_07a_imaging_pipeline_report.md
 │   └── phase_07f_slicer_integration_readiness_report.md
 ├── schemas/
 │   ├── treatment_outcome_case.schema.json    # JSON Schema (Draft-07) for CMF case records
-│   └── imaging_evidence_output.schema.json   # JSON Schema for Slicer imaging evidence
+│   ├── imaging_evidence_output.schema.json   # JSON Schema for Slicer imaging evidence
+│   └── immediate_postop_observation.schema.json # Non-scoring post-op observation contract
 ├── scripts/
 │   └── slicer/                      # 3D Slicer executable integration scripts
 ├── src/
