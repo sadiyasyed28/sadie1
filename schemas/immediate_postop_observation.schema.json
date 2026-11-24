@@ -1,0 +1,419 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/sadiyasyed28/sadie1/blob/main/schemas/immediate_postop_observation.schema.json",
+  "title": "ADRAB Immediate Post-Operative Observation Record",
+  "description": "Non-scoring record for attributed clinical and radiological observations captured against the surgeon-review-pending Immediate Post-Operative Maxillofacial Trauma Rubric. Clinical grades and outcome decisions are intentionally excluded.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_id",
+    "case_id",
+    "rubric_reference",
+    "fracture_types",
+    "assessment_timing",
+    "observations",
+    "created_at",
+    "created_by"
+  ],
+  "properties": {
+    "record_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "case_id": {
+      "type": "string",
+      "pattern": "^CASE-[A-Z0-9]{4,12}$"
+    },
+    "rubric_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rubric_id",
+        "version",
+        "approval_status"
+      ],
+      "properties": {
+        "rubric_id": {
+          "const": "immediate-postop-maxillofacial-trauma"
+        },
+        "version": {
+          "const": "1.0-draft"
+        },
+        "approval_status": {
+          "const": "SURGEON_REVIEW_PENDING"
+        },
+        "source_document": {
+          "type": "string",
+          "const": "Rubric & assessment guide_Maxillofacial_Trauma_Immediate_PostOp"
+        }
+      }
+    },
+    "fracture_types": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "MANDIBULAR",
+          "ZMC_ZYGOMATIC_ARCH",
+          "ORBITAL_FLOOR_MEDIAL_WALL_TRAPDOOR",
+          "LE_FORT_MIDFACE",
+          "NOE",
+          "FRONTAL_PANFACIAL"
+        ]
+      }
+    },
+    "assessment_timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase",
+        "postoperative_day"
+      ],
+      "properties": {
+        "phase": {
+          "type": "string",
+          "enum": [
+            "PACU",
+            "IMMEDIATE_POSTOPERATIVE",
+            "EARLY_ROUNDS",
+            "OTHER"
+          ]
+        },
+        "postoperative_day": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 3650
+        },
+        "timing_note": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      }
+    },
+    "observations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "observation_id",
+          "criterion_key",
+          "criterion_label",
+          "evidence_type",
+          "observation_state",
+          "recorded_by",
+          "recorded_at"
+        ],
+        "properties": {
+          "observation_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "criterion_key": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]{2,120}$"
+          },
+          "criterion_label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "evidence_type": {
+            "type": "string",
+            "enum": [
+              "CLINICAL",
+              "RADIOLOGICAL",
+              "PATIENT_REPORTED"
+            ]
+          },
+          "observation_state": {
+            "type": "string",
+            "enum": [
+              "RECORDED",
+              "NOT_ASSESSED",
+              "NOT_APPLICABLE",
+              "UNCERTAIN",
+              "CONFLICTING"
+            ]
+          },
+          "observation_text": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 5000
+          },
+          "measurement": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "required": [
+              "value",
+              "unit"
+            ],
+            "properties": {
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "method": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 500
+              },
+              "reference_side": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "enum": [
+                  "CONTRALATERAL",
+                  "PRE_INJURY_BASELINE",
+                  "NONE",
+                  "UNKNOWN",
+                  null
+                ]
+              }
+            }
+          },
+          "imaging_reference": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "file_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 200
+              },
+              "modality": {
+                "type": "string",
+                "enum": [
+                  "CT",
+                  "CBCT",
+                  "OPG",
+                  "XRAY",
+                  "OTHER"
+                ]
+              },
+              "view_or_plane": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 100
+              },
+              "slice_thickness_mm": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0
+              },
+              "quality_limitations": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 2000
+              }
+            }
+          },
+          "recorded_by": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 150
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reviewed_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 150
+          },
+          "reviewed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "observation_state": {
+                  "const": "RECORDED"
+                }
+              },
+              "required": [
+                "observation_state"
+              ]
+            },
+            "then": {
+              "required": [
+                "observation_text"
+              ],
+              "properties": {
+                "observation_text": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "safety_events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "event_id",
+          "flag_key",
+          "description",
+          "detected_at",
+          "status"
+        ],
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "flag_key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 3000
+          },
+          "detected_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "ACKNOWLEDGED",
+              "RESOLVED",
+              "FALSE_POSITIVE_REVIEW_PENDING"
+            ]
+          },
+          "acknowledged_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 150
+          },
+          "acknowledged_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "action_documentation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 3000
+          }
+        }
+      },
+      "default": []
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_by": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 150
+    },
+    "updated_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "record_notes": {
+      "type": "string",
+      "maxLength": 5000
+    }
+  },
+  "not": {
+    "anyOf": [
+      {
+        "required": [
+          "grade"
+        ]
+      },
+      {
+        "required": [
+          "criterion_grade"
+        ]
+      },
+      {
+        "required": [
+          "total_score"
+        ]
+      },
+      {
+        "required": [
+          "mean_score"
+        ]
+      },
+      {
+        "required": [
+          "overall_outcome"
+        ]
+      },
+      {
+        "required": [
+          "pass_fail"
+        ]
+      },
+      {
+        "required": [
+          "recommendation"
+        ]
+      }
+    ]
+  }
+}
