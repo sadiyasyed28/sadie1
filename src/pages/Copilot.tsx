@@ -20,7 +20,6 @@ import {
   Share2,
   FileText
 } from 'lucide-react';
-import { mockCases } from '../data/mockData';
 import { CopilotConversation, CopilotMessage } from '../types';
 import { api } from '../services/api';
 import { useToast } from '../components/ui/Toast';
@@ -39,13 +38,11 @@ export const Copilot: React.FC = () => {
   const [isSending, setIsSending] = useState(false);
   const [isConfidential, setIsConfidential] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<string[]>([]);
-  const [lastUserQuery, setLastUserQuery] = useState('Hi');
-  const [reasoningStepIndex, setReasoningStepIndex] = useState(0);
 
   // Optional drawer/modal toggles
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isContextPanelOpen, setIsContextPanelOpen] = useState(false);
-  const [selectedCaseId, setSelectedCaseId] = useState<string>(mockCases[0]?.id || 'case-101');
+  const [selectedCaseId, setSelectedCaseId] = useState<string>('');
   const [searchHistoryQuery, setSearchHistoryQuery] = useState('');
 
   // Conversation state: false = hero landing state, true = active conversation state
@@ -76,14 +73,12 @@ export const Copilot: React.FC = () => {
 
   const handleSendMessage = async (textToSend?: string) => {
     const text = textToSend || inputMessage;
-    if (!text.trim()) return;
-
     const trimmedText = text.trim();
-    setLastUserQuery(trimmedText);
+    if (!trimmedText || isSending) return;
+
     setInputMessage('');
     setIsSending(true);
     setIsChatActive(true);
-    setReasoningStepIndex(0);
 
     const userMsgPlaceholder: CopilotMessage = {
       id: `usr-${Date.now()}`,
@@ -93,47 +88,43 @@ export const Copilot: React.FC = () => {
     };
 
     let targetConvoId = activeConvoId;
-    if (!targetConvoId) {
-      try {
+    try {
+      if (!targetConvoId) {
         const newConvo = await api.createConversation(
           trimmedText.slice(0, 32) + (trimmedText.length > 32 ? '...' : '')
         );
         targetConvoId = newConvo.id;
         setActiveConvoId(newConvo.id);
-        setConversations(prev => [
-          { ...newConvo, messages: [userMsgPlaceholder] },
-          ...prev.filter(c => c.id !== newConvo.id)
-        ]);
-      } catch {
-        toast({ type: 'error', title: 'Error starting conversation' });
-        setIsSending(false);
-        return;
+        setConversations(prev => [{ ...newConvo, messages: [userMsgPlaceholder] }, ...prev]);
+      } else {
+        setConversations(prev =>
+          prev.map(convo => convo.id === targetConvoId
+            ? { ...convo, messages: [...convo.messages, userMsgPlaceholder] }
+            : convo)
+        );
       }
-    } else {
+
+      await api.sendMessage(targetConvoId, trimmedText);
+      const updatedList = await api.getConversations();
+      setConversations(updatedList);
+      setAttachedFiles([]);
+    } catch (error) {
       setConversations(prev =>
-        prev.map(c => c.id === targetConvoId ? { ...c, messages: [...c.messages, userMsgPlaceholder] } : c)
+        prev.map(convo => convo.id === targetConvoId
+          ? { ...convo, messages: convo.messages.filter(message => message.id !== userMsgPlaceholder.id) }
+          : convo)
       );
+      setInputMessage(trimmedText);
+      toast({
+        type: 'error',
+        title: 'Assistant is not connected',
+        message: error instanceof Error ? error.message : 'No assistant response was generated.'
+      });
+    } finally {
+      setIsSending(false);
     }
-
-    // Staggered execution of reasoning steps with fluid animation intervals
-    setTimeout(() => setReasoningStepIndex(1), 350);
-    setTimeout(() => setReasoningStepIndex(2), 750);
-    setTimeout(() => setReasoningStepIndex(3), 1150);
-    setTimeout(() => setReasoningStepIndex(4), 1550);
-
-    setTimeout(async () => {
-      try {
-        await api.sendMessage(targetConvoId, trimmedText);
-        const updatedList = await api.getConversations();
-        setConversations(updatedList);
-        setAttachedFiles([]);
-      } catch {
-        toast({ type: 'error', title: 'Error sending message' });
-      } finally {
-        setIsSending(false);
-      }
-    }, 1800);
   };
+
 
   const handleAttachClick = () => {
     if (fileInputRef.current) {
@@ -142,16 +133,18 @@ export const Copilot: React.FC = () => {
   };
 
   const handleFileAttached = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const fileName = e.target.files[0].name;
-      setAttachedFiles(prev => [...prev, fileName]);
-      toast({ type: 'success', title: 'File Attached', message: `${fileName} ready for AI context.` });
-    }
+    e.target.value = '';
+    toast({
+      type: 'info',
+      title: 'File upload is not connected',
+      message: 'No file was uploaded or sent to an AI service. File storage and imaging ingestion are not implemented yet.'
+    });
   };
+
 
   const handleImportPlan = () => {
     setIsContextPanelOpen(true);
-    toast({ type: 'info', title: 'Context & Sources Opened', message: 'Select sample dossiers or inspect case evidence.' });
+    toast({ type: 'info', title: 'Sources panel opened', message: 'Live case files and document indexing are not connected yet.' });
   };
 
   const handleStartFresh = () => {
@@ -162,17 +155,11 @@ export const Copilot: React.FC = () => {
   };
 
   const suggestionChips = [
-    { label: 'Auto Case Summary', prompt: 'Generate an executive summary of Eleanor Vance surgical outcome and cephalometric changes' },
-    { label: 'Anomaly Detection', prompt: 'Scan CT volume for anatomical anomalies, condylar sag, or hardware displacement' },
-    { label: 'Predictive Analytics', prompt: 'Forecast 24-month skeletal remodeling and relapse probability model' },
-    { label: 'NL Imaging Query', prompt: 'Query imaging: Calculate 3D vector deviation of maxillary occlusal plane relative to Frankfort Horizontal' },
-    { label: 'Landmark Detection', prompt: 'Detect automated 3D cephalometric landmarks: Sella, Nasion, A-Point, B-Point, and Menton' },
-    { label: 'Rubric Scoring', prompt: 'Evaluate case against NSQIP OMFS rubric criteria and suggest objective domain scores' },
-    { label: 'Treatment Engine', prompt: 'Generate evidence-based post-operative treatment recommendations and retention protocol' },
-    { label: 'Literature Search', prompt: 'Search clinical literature for maxillofacial osteotomy relapse rates and consensus stability standards' },
+    { label: 'Project architecture', prompt: 'Help me review the software architecture and backend tasks for ADRAB.' },
+    { label: 'Explain a concept', prompt: 'Explain a maxillofacial imaging or software engineering concept at a general educational level.' },
+    { label: 'Source organisation', prompt: 'Help me organise the project bibliography and source files for surgeon review.' },
+    { label: 'Development help', prompt: 'Help me plan and debug a non-clinical software feature in this project.' },
   ];
-
-  const currentCase = mockCases[0];
 
   return (
     <div className="relative h-full min-h-[calc(100vh-2rem)] min-h-[calc(100dvh-2rem)] flex flex-col justify-between w-full select-none">
@@ -235,19 +222,24 @@ export const Copilot: React.FC = () => {
           <div className="mb-7 flex justify-center animate-drop-down">
             <div className="inline-flex items-center gap-2.5 px-4.5 py-1.5 rounded-pill bg-elevated border border-border-hairline text-sm text-primary shadow-sm backdrop-blur-md">
               <span className="text-primary text-sm">✦</span>
-              <span className="font-medium tracking-wide">AI Clinical Evaluator</span>
+              <span className="font-medium tracking-wide">Research & Project Copilot</span>
             </div>
           </div>
 
           {/* Hero Editorial Heading (Lora serif) */}
           <div className="text-center max-w-3xl mx-auto mb-9 animate-drop-down" style={{ animationDelay: '60ms' }}>
             <h1 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight text-primary leading-[1.25]">
-              Maxillofacial Surgical Evaluator
+              ADRAB Project Assistant
             </h1>
             <h2 className="font-serif text-lg sm:text-xl font-medium tracking-tight text-secondary mt-1.5 leading-[1.25]">
-              Radiomics & 3D Cephalometrics
+              Software development and research support
             </h2>
           </div>
+
+            <p className="text-xs text-muted text-center max-w-2xl mt-4 leading-relaxed">
+              Non-clinical prototype only. It does not access patient records, analyse scans, score healing, or provide treatment advice.
+              Do not enter identifiable patient information. File upload and the live AI provider are not connected yet.
+            </p>
 
           {/* Central Landing Input Card (SADIE Design System) */}
           <div className="w-full max-w-3xl lg:max-w-4xl bg-surface border border-border-hairline rounded-2xl p-5 sm:p-6 shadow-card transition-all duration-200 focus-within:ring-2 focus-within:ring-accent/40 animate-card-in" style={{ animationDelay: '120ms' }}>
@@ -283,7 +275,7 @@ export const Copilot: React.FC = () => {
                   handleSendMessage();
                 }
               }}
-              placeholder="Ask about cases, landmarks, or surgical stability..."
+              placeholder="Ask about project development, source organisation, or general concepts..."
               className="w-full bg-transparent text-base sm:text-lg text-primary placeholder:text-muted focus:outline-none resize-none leading-relaxed min-h-[64px]"
             />
 
@@ -370,74 +362,14 @@ export const Copilot: React.FC = () => {
               <ClinicalMessageView
                 key={msg.id}
                 message={msg}
-                queryTitle={lastUserQuery}
-                scopedCaseName={currentCase?.patientName || 'Eleanor Vance'}
-                scopedCaseId={currentCase?.caseNumber || 'CAS-8821'}
+
               />
             ))}
 
-            {/* In-Flight Real-Time Thinking Progress (Card-Free, Sleek Fluid Timeline) */}
             {isSending && (
-              <div className="py-3 space-y-3 animate-reply-in max-w-3xl">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-btn-primary-bg text-btn-primary-text flex items-center justify-center text-xs font-bold shrink-0 animate-spin">
-                    ✦
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-xs text-primary">SADIE</span>
-                    <span className="text-[11px] text-muted font-mono animate-pulse">evaluating maxillofacial records...</span>
-                  </div>
-                </div>
-
-                {/* Direct inline timeline with subtle border-l (No card wrapper) */}
-                <div className="border-l-2 border-border-hairline pl-3.5 my-2 space-y-2.5 text-xs">
-                  {/* Searched Sources chips */}
-                  <div className="flex items-center gap-1.5 flex-wrap pb-1">
-                    <span className="text-muted text-[11px] flex items-center gap-1">
-                      <Globe className="w-3 h-3 text-muted" /> Searched:
-                    </span>
-                    {['Patient CBCT Archive', 'Operative Transcription', 'Cephalometric Norms v3.2', 'NSQIP Clinical Rubric'].map((s, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-elevated border border-border-hairline text-secondary font-mono"
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#8EC5E8]" />
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Progressive animated step-by-step display */}
-                  <div className="space-y-2 pl-0.5">
-                    {[
-                      `Finding patient DICOM scan: ${currentCase?.patientName || 'Eleanor_Vance'}_PostOp_CBCT.dcm...`,
-                      'Calculating 3D cephalometric landmarks (SNA, SNB, ANB, Pog, Menton)...',
-                      'Calculating airway volumetric clearance and minimum cross-sectional area...',
-                      'Evaluating clinical decision criteria against NSQIP standards...',
-                      'Synthesizing clinical evaluation decision recommendation...'
-                    ].map((stepText, idx) => {
-                      const isDone = idx < reasoningStepIndex;
-                      const isActive = idx === reasoningStepIndex;
-                      if (idx > reasoningStepIndex) return null;
-
-                      return (
-                        <div
-                          key={idx}
-                          className={`flex items-start gap-2 text-xs transition-all animate-reply-in ${
-                            isActive ? 'text-primary font-medium' : 'text-secondary'
-                          }`}
-                        >
-                          {isDone ? (
-                            <span className="text-[#8EC5E8] mt-0.5 text-[11px] font-bold shrink-0">✓</span>
-                          ) : (
-                            <span className="w-2 h-2 rounded-full bg-[#8EC5E8] mt-1 shrink-0 animate-ping" />
-                          )}
-                          <span className="leading-relaxed">{stepText}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+              <div className="py-3 flex items-center gap-2.5 text-xs text-secondary" role="status" aria-live="polite">
+                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                Sending message to the project assistant…
               </div>
             )}
 
