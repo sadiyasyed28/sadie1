@@ -38,8 +38,6 @@ export const Copilot: React.FC = () => {
   const [isSending, setIsSending] = useState(false);
   const [isConfidential, setIsConfidential] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<string[]>([]);
-  const [lastUserQuery, setLastUserQuery] = useState('Hi');
-  const [reasoningStepIndex, setReasoningStepIndex] = useState(0);
 
   // Optional drawer/modal toggles
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
