@@ -260,3 +260,102 @@ create policy "private case file insert" on storage.objects
     bucket_id = 'case-files'
     and public.can_write_case(((storage.foldername(name))[1])::uuid)
   );
+
+
+-- Hardening pass: prevent self-assigned privileged roles and restrict conversation ownership.
+revoke all on public.profiles from anon, authenticated;
+grant select on public.profiles to authenticated;
+grant update(display_name) on public.profiles to authenticated;
+
+create or replace function public.handle_new_auth_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.profiles (user_id, display_name, role)
+  values (new.id, coalesce(new.raw_user_meta_data->>'display_name', ''), 'clinician')
+  on conflict (user_id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created_profile on auth.users;
+create trigger on_auth_user_created_profile
+  after insert on auth.users
+  for each row execute procedure public.handle_new_auth_user();
+
+-- Membership is granted through an owner-checked RPC, never by direct table writes.
+create or replace function public.grant_case_access(
+  p_case_id uuid,
+  p_user_id uuid,
+  p_permission text default 'read'
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'Authentication required';
+  end if;
+  if p_permission not in ('read', 'write') then
+    raise exception 'Invalid permission';
+  end if;
+  if not exists (
+    select 1 from public.cases
+    where id = p_case_id and owner_id = auth.uid()
+  ) then
+    raise exception 'Only the case owner can grant access';
+  end if;
+
+  insert into public.case_members (case_id, user_id, permission, invited_by)
+  values (p_case_id, p_user_id, p_permission, auth.uid())
+  on conflict (case_id, user_id)
+  do update set permission = excluded.permission, invited_by = excluded.invited_by;
+end;
+$$;
+
+revoke all on function public.grant_case_access(uuid, uuid, text) from public;
+grant execute on function public.grant_case_access(uuid, uuid, text) to authenticated;
+
+-- A file metadata row must point to an object in its own case folder.
+alter table public.case_files
+  add constraint case_files_object_path_matches_case
+  check (split_part(object_path, '/', 1) = case_id::text) not valid;
+alter table public.case_files
+  validate constraint case_files_object_path_matches_case;
+
+-- Conversation ownership is always the authenticated user, even for case-scoped threads.
+drop policy if exists "conversation owner or case member" on public.copilot_conversations;
+create policy "conversation owner and case access" on public.copilot_conversations
+  for all to authenticated
+  using (user_id = auth.uid() and (case_id is null or public.has_case_access(case_id)))
+  with check (user_id = auth.uid() and (case_id is null or public.has_case_access(case_id)));
+
+create or replace function public.has_conversation_access(p_conversation_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.copilot_conversations c
+    where c.id = p_conversation_id
+      and c.user_id = auth.uid()
+      and (c.case_id is null or public.has_case_access(c.case_id))
+  );
+$$;
+
+revoke all on function public.has_case_access(uuid) from public;
+revoke all on function public.can_write_case(uuid) from public;
+revoke all on function public.has_conversation_access(uuid) from public;
+grant execute on function public.has_case_access(uuid) to authenticated;
+grant execute on function public.can_write_case(uuid) to authenticated;
+grant execute on function public.has_conversation_access(uuid) to authenticated;
+
+-- Audit records are append-only. Application users cannot manufacture, edit, or delete them.
+drop policy if exists "audit append" on public.audit_events;
