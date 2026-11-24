@@ -81,3 +81,6 @@
 - **Full Verbatim Precision:** 48 of 48 records (100%) have been verified against original PDF text streams, accounting for typographical hyphens, font ligatures (`fi`, `fl`, `ff`), and multi-page paragraph continuations.
 - **Numerical Claims:** All explicit numbers (percentages, week intervals, month ranges, slice thicknesses, and Hounsfield Unit values) match the original source printing exactly.
 - **Audit Flag Resolution:** All preliminary "first-three-word" audit flags have been formally resolved and updated to fully verified status.
+
+
+> **Bibliographic correction note:** This surgeon handoff copy corrects known legacy identifier mismatches against the corresponding PubMed/PMC records: Bly et al. PMID 23306963 (PMCID PMC5951614), Kroon et al. PMID 1894737, Mosbah et al. PMID 12729774, Whitehouse PMCID PMC504886, and Mittermiller PMCID PMC6839979. The canonical reference list is `../Research_Paper_Bibliography.csv` (for research reports, use `../Research_Paper_Bibliography.csv` relative to `02_Research_Papers/`). Review each linked source before using any threshold or clinical claim.
