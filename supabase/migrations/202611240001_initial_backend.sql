@@ -359,3 +359,81 @@ grant execute on function public.has_conversation_access(uuid) to authenticated;
 
 -- Audit records are append-only. Application users cannot manufacture, edit, or delete them.
 drop policy if exists "audit append" on public.audit_events;
+
+
+-- Private file deletion is restricted to case writers.
+create policy "case file metadata delete" on public.case_files
+  for delete to authenticated using (public.can_write_case(case_id));
+
+create policy "private case file delete" on storage.objects
+  for delete to authenticated
+  using (
+    bucket_id = 'case-files'
+    and public.can_write_case(((storage.foldername(name))[1])::uuid)
+  );
+
+-- Append-only audit events are written by this trigger, not directly by the browser.
+create or replace function public.write_case_audit_event()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_row jsonb;
+  v_case_id uuid;
+  v_resource_id text;
+  v_actor uuid;
+begin
+  v_row := case when tg_op = 'DELETE' then to_jsonb(old) else to_jsonb(new) end;
+  v_actor := auth.uid();
+
+  if tg_table_name = 'cases' then
+    v_case_id := (v_row->>'id')::uuid;
+    v_resource_id := v_row->>'id';
+    if v_actor is null then v_actor := nullif(v_row->>'owner_id','')::uuid; end if;
+  else
+    v_case_id := nullif(v_row->>'case_id','')::uuid;
+    v_resource_id := v_row->>'id';
+    if v_actor is null then
+      v_actor := coalesce(
+        nullif(v_row->>'recorded_by','')::uuid,
+        nullif(v_row->>'created_by','')::uuid,
+        nullif(v_row->>'uploaded_by','')::uuid,
+        nullif(v_row->>'user_id','')::uuid
+      );
+    end if;
+  end if;
+
+  if v_actor is not null then
+    insert into public.audit_events (
+      case_id, actor_id, action, resource_type, resource_id, metadata
+    ) values (
+      case when tg_table_name = 'cases' and tg_op = 'DELETE' then null else v_case_id end,
+      v_actor,
+      lower(tg_op),
+      tg_table_name,
+      v_resource_id,
+      jsonb_build_object('recorded_at', now())
+    );
+  end if;
+
+  return case when tg_op = 'DELETE' then old else new end;
+end;
+$$;
+
+create trigger audit_cases
+  after insert or update or delete on public.cases
+  for each row execute procedure public.write_case_audit_event();
+create trigger audit_case_files
+  after insert or update or delete on public.case_files
+  for each row execute procedure public.write_case_audit_event();
+create trigger audit_postop_observations
+  after insert or update or delete on public.postop_observations
+  for each row execute procedure public.write_case_audit_event();
+create trigger audit_safety_events
+  after insert or update or delete on public.safety_events
+  for each row execute procedure public.write_case_audit_event();
+create trigger audit_copilot_conversations
+  after insert or update or delete on public.copilot_conversations
+  for each row execute procedure public.write_case_audit_event();
