@@ -25,9 +25,9 @@ All 14 studies specifically target the evidence gaps identified in Phase 2:
 
 #### Domain 2: Orbital Reconstruction, Volumetry, Enophthalmos & Diplopia
 - **Selected Studies:**
-  - `PAP-003` / `RES-EVD-003`: Whitehouse et al. (1994), *Br J Ophthalmol*, PMID: 7918289, PMC504888.
+  - `PAP-003` / `RES-EVD-003`: Whitehouse et al. (1994), *Br J Ophthalmol*, PMID: 7918289, PMC504886.
   - `PAP-004` / `RES-EVD-004`: Zhang et al. (2012), *J Oral Maxillofac Surg*, PMID: 21664740.
-  - `PAP-005` / `RES-EVD-005`: Bly et al. (2013), *JAMA Facial Plast Surg*, PMID: 23328551.
+  - `PAP-005` / `RES-EVD-005`: Bly et al. (2013), *JAMA Facial Plast Surg*, PMID: 23306963.
 - **Key Evidentiary Findings:**
   - **Volumetric Conversion Ratio:** Whitehouse et al. established that **each $1.0\text{ cm}^3$ ($1.0\text{ mL}$) increase in orbital volume results in $0.8\text{ mm}$ of enophthalmos**.
   - **Anatomical Specificity:** Zhang et al. proved that total herniation alone is not the sole driver; orbital floor herniation **posterior to the vertical eyeball equator** is the primary anatomical determinant of clinically significant enophthalmos ($P < .05$).
@@ -39,7 +39,7 @@ All 14 studies specifically target the evidence gaps identified in Phase 2:
   - `PAP-006` / `RES-EVD-006`: Eckelt et al. (2006), *J Craniomaxillofac Surg*, PMID: 16781159 (Multicenter RCT).
   - `PAP-007` / `RES-EVD-007`: Ellis et al. (2000), *J Oral Maxillofac Surg*, PMID: 10716106.
   - `PAP-008` / `RES-EVD-008`: Adeyemi, Adeyemo et al. (2012), *J Oral Maxillofac Surg*, PMID: 22793957.
-  - `PAP-009` / `RES-EVD-009`: Kroon et al. (1991), *J Craniomaxillofac Surg*, PMID: 1943807.
+  - `PAP-009` / `RES-EVD-009`: Kroon et al. (1991), *J Craniomaxillofac Surg*, PMID: 1894737.
 - **Key Evidentiary Findings:**
   - **Maximal Interincisal Opening (MIO):** Eckelt et al. demonstrated that operative treatment (ORIF) produces significantly greater mean MIO ($46.5\text{ mm}$ vs. $40.9\text{ mm}$, $P = 0.001$), greater protrusion ($7.3\text{ mm}$ vs. $4.7\text{ mm}$), and lower terminal deviation ($19\%$ vs. $66\%$).
   - **Occlusal Predictability:** Ellis et al. established that closed reduction leads to significantly higher rates of malocclusion compared to open reduction across all initial displacement levels.
@@ -50,7 +50,7 @@ All 14 studies specifically target the evidence gaps identified in Phase 2:
 #### Domain 4: Postoperative Complications, Hardware Morbidity & Safety
 - **Selected Studies:**
   - `PAP-010` / `RES-EVD-010`: Nagase et al. (2005), *Ann Plast Surg*, PMID: 16327461 (13-year cohort).
-  - `PAP-011` / `RES-EVD-011`: Mosbah et al. (2003), *Int J Oral Maxillofac Surg*, PMID: 12615467.
+  - `PAP-011` / `RES-EVD-011`: Mosbah et al. (2003), *Int J Oral Maxillofac Surg*, PMID: 12729774.
 - **Key Evidentiary Findings:**
   - **Plate Removal Incidence:** Nagase et al. found a **$33.3\%$ overall removal rate**; $64.4\%$ of removals were driven by complications, with hardware palpability, cold intolerance, and pain accounting for **$72.4\%$ of complication-related removals**. Palpability concentrated over thin soft tissue envelopes (supraorbital, infraorbital, and mental foramina).
   - **Site Pain:** Mosbah et al. recorded a **$14\%$ incidence of localized post-surgical hardware pain**, with infection and wound dehiscence driving early hardware removal.
@@ -68,7 +68,7 @@ All 14 studies specifically target the evidence gaps identified in Phase 2:
 
 #### Domain 6: Observer Agreement & Measurement Reliability
 - **Selected Studies:**
-  - `PAP-014` / `RES-EVD-014`: Mittermiller, Cornelius, Audigé et al. (2019), *Craniomaxillofac Trauma Reconstr*, PMID: 31719949, PMC6834479.
+  - `PAP-014` / `RES-EVD-014`: Mittermiller, Cornelius, Audigé et al. (2019), *Craniomaxillofac Trauma Reconstr*, PMID: 31719949, PMC6839979.
 - **Key Evidentiary Findings:**
   - Multicenter evaluation of 200 CT scans by 15 surgeons demonstrated that **Level 2 fracture location variables have high interobserver reliability ($\text{median }\kappa = 0.69$, $94\%$ agreement)**, but **Level 3 morphology/displacement variables exhibit lower reliability ($\text{median }\kappa = 0.59$, $91\%$ agreement)**.
   - Surgical experience significantly increased reliability ($\kappa = 0.66$ high experience vs. $0.48$ low experience).
@@ -82,3 +82,6 @@ All 14 studies specifically target the evidence gaps identified in Phase 2:
 3. [data/extracted/research_evidence_batch_01.csv](file:///c:/ML_Projects/adrab/adrab/data/extracted/research_evidence_batch_01.csv) — 14 granular evidence records with 15 standardized audit fields.
 4. [reports/research_batch_01_summary.md](file:///c:/ML_Projects/adrab/adrab/reports/research_batch_01_summary.md) — Synthesis of research findings across all 6 core outcome domains.
 5. [reports/research_verification_log.md](file:///c:/ML_Projects/adrab/adrab/reports/research_verification_log.md) — Detailed audit log resolving previous quotation screening limitations and verifying 100% of textbook and research claims.
+
+
+> **Bibliographic correction note:** This surgeon handoff copy corrects known legacy identifier mismatches against the corresponding PubMed/PMC records: Bly et al. PMID 23306963 (PMCID PMC5951614), Kroon et al. PMID 1894737, Mosbah et al. PMID 12729774, Whitehouse PMCID PMC504886, and Mittermiller PMCID PMC6839979. The canonical reference list is `../Research_Paper_Bibliography.csv` (for research reports, use `../Research_Paper_Bibliography.csv` relative to `02_Research_Papers/`). Review each linked source before using any threshold or clinical claim.
