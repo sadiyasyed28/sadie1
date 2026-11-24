@@ -60,6 +60,35 @@ export const ClinicalMessageView: React.FC<ClinicalMessageViewProps> = ({
     );
   }
 
+  // Plain assistant replies are rendered as conversation only.
+  // Do not invent case dossiers, sources, measurements or reasoning traces when none were returned.
+  if (!message.clinicalDossier && !message.thinkingTrace && !message.nestedCard && !message.measurements) {
+    return (
+      <div className="py-4 space-y-3 text-primary animate-reply-in">
+        <div className="flex items-center gap-3">
+          <div className="w-7 h-7 rounded-full bg-btn-primary-bg text-btn-primary-text flex items-center justify-center font-serif text-sm font-bold shrink-0 shadow-sm">
+            ✦
+          </div>
+          <span className="font-semibold text-sm text-primary">SADIE</span>
+          <span className="text-xs text-muted">• {message.timestamp || 'Just now'}</span>
+        </div>
+        <div className="pl-10">
+          <p className="text-sm sm:text-base text-primary leading-relaxed whitespace-pre-wrap">{message.content}</p>
+          {message.sources && message.sources.length > 0 && (
+            <div className="mt-3 space-y-1">
+              <p className="text-xs uppercase tracking-wider text-muted">Returned references</p>
+              {message.sources.map((source, index) => (
+                <p key={index} className="text-xs text-secondary">
+                  {source.title} — {source.ref}
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // AI MESSAGE VIEW: Direct natural conversational flow (NO CARDS), animated progressively
   const trace = message.thinkingTrace || {
     duration: '2.4s',
